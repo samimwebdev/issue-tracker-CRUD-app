@@ -1,9 +1,24 @@
 import { Table } from 'react-bootstrap'
 import Issue from './Issue'
-const Issues = ({ issues, deleteIssue, completeIssue }) => {
+import IssueBar from './IssueBar'
+const Issues = ({
+  issues,
+  deleteIssue,
+  completeIssue,
+  totalCount,
+  newCount,
+  progressCount,
+  completedCount,
+}) => {
   return (
     <>
       <h1>All Issues...</h1>
+      <IssueBar
+        totalCount={totalCount}
+        newCount={newCount}
+        progressCount={progressCount}
+        completedCount={completedCount}
+      />
       <Table responsive striped bordered hover>
         <thead>
           <tr>

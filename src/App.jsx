@@ -1,12 +1,14 @@
 import { useState } from 'react'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { Container, Row, Col } from 'react-bootstrap'
-import { ToastContainer } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import AddIssue from './AddIssue'
 import IssueBar from './IssueBar'
 import Issues from './Issues'
 import Navigation from './Navigation'
 import './index.css'
 import 'react-toastify/dist/ReactToastify.min.css'
+import EditIssue from './EditIssue'
 
 const App = () => {
   const [issues, setIssues] = useState([
@@ -17,7 +19,6 @@ const App = () => {
       assignedTo: 'samim',
       startDate: '',
       endDate: '',
-      completed: false,
       priority: 'medium',
       status: 'new',
       completedPercentage: 90,
@@ -45,6 +46,18 @@ const App = () => {
     }
   }
 
+  // const pickIssueToUpdate = (id) => {
+  //   const issue = issues.find((issue) => issue.id === id)
+  //   console.log('calling...')
+  //   // if (!issue) {
+  //   //   toast('No Issue Found to be edit')
+  //   //   return navigate('/issues')
+  //   // }
+
+  //   const pick = setPickedIssue(issue)
+  //   return issue
+  // }
+
   const deleteIssue = (id) => {
     console.log(id)
 
@@ -55,7 +68,19 @@ const App = () => {
 
     //show toast message after deletion of the issue
   }
-
+  const updateIssue = (pickedIssue) => {
+    const updatedIssue = issues.map((issue) => {
+      if (issue.id === pickedIssue.id) {
+        return {
+          id: issue.id,
+          ...pickedIssue,
+        }
+      } else {
+        return issue
+      }
+    })
+    setIssues(updatedIssue)
+  }
   const completeIssue = (id) => {
     const updatedIssue = issues.map((issue) => {
       if (issue.id === id) {
@@ -71,33 +96,51 @@ const App = () => {
     setIssues(updatedIssue)
   }
   return (
-    <Row>
-      <ToastContainer
-        position='top-right'
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-      />
-      <Navigation />
-      <Col sm={{ span: 10, offset: 1 }}>
-        <Container>
-          <AddIssue addIssue={addIssue} />
-          <IssueBar
-            totalCount={totalCount}
-            newCount={newCount}
-            progressCount={progressCount}
-            completedCount={completedCount}
-          />
-          <Issues
-            issues={issues}
-            deleteIssue={deleteIssue}
-            completeIssue={completeIssue}
-          />
-        </Container>
-      </Col>
-    </Row>
+    <BrowserRouter>
+      <Row>
+        <ToastContainer
+          position='top-right'
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+        />
+        <Navigation />
+
+        <Col sm={{ span: 10, offset: 1 }}>
+          <Container>
+            <Routes>
+              <Route
+                path='/issues/add'
+                element={<AddIssue addIssue={addIssue} />}
+              ></Route>{' '}
+              <Route
+                index
+                path='/edit/:id'
+                element={
+                  <EditIssue issues={issues} updateIssue={updateIssue} />
+                }
+              ></Route>{' '}
+              <Route
+                path='/issues'
+                element={
+                  <Issues
+                    issues={issues}
+                    deleteIssue={deleteIssue}
+                    completeIssue={completeIssue}
+                    totalCount={totalCount}
+                    newCount={newCount}
+                    progressCount={progressCount}
+                    completedCount={completedCount}
+                  />
+                }
+              />
+            </Routes>
+          </Container>
+        </Col>
+      </Row>
+    </BrowserRouter>
   )
 }
 

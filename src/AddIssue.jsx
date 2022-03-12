@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Col, Form, Row, Button } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 
 const defaultIssue = {
@@ -23,6 +24,8 @@ const AddIssue = ({ addIssue }) => {
     startDate: '',
     endDate: '',
   })
+
+  const navigate = useNavigate()
 
   const handleChange = (evt) => {
     setIssue({
@@ -84,6 +87,8 @@ const AddIssue = ({ addIssue }) => {
         id: uuid(),
         ...issue,
       })
+      //navigate to issue page
+      navigate('/issues')
       //reset the form
       setIssue(defaultIssue)
     }

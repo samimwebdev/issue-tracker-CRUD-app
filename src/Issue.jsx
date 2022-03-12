@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Badge,
   ProgressBar,
@@ -22,6 +23,7 @@ const Issue = ({ issue, deleteIssue, completeIssue }) => {
   } = issue
 
   const [showModal, setShowModal] = useState(false)
+  const navigate = useNavigate()
 
   const handleClose = (evt) => {
     if (evt.target.dataset.action === 'delete') {
@@ -85,7 +87,10 @@ const Issue = ({ issue, deleteIssue, completeIssue }) => {
           />
         </td>
         <td className='d-flex justify-content-between'>
-          <FaEdit className='text-info' />
+          <FaEdit
+            className='text-info'
+            onClick={() => navigate(`/edit/${id}`)}
+          />
           <FaCheckSquare
             onClick={() => completeIssue(id)}
             className='text-success'
