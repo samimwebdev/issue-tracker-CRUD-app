@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Col, Form, Row, Button } from 'react-bootstrap'
 import { v4 as uuid } from 'uuid'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 const defaultIssue = {
@@ -15,9 +15,24 @@ const defaultIssue = {
   completedPercentage: 1,
 }
 
-const AddIssue = ({ addIssue }) => {
+const EditIssue = ({ addIssue, issues, updateIssue }) => {
   const [issue, setIssue] = useState(defaultIssue)
   const navigate = useNavigate()
+  const { id } = useParams()
+  console.log(id)
+
+  const issueToEdit = () => {
+    const foundIssue = issues.find((issue) => issue.id === id)
+    if (!foundIssue) {
+      toast.error('Issue is not found to be updated')
+      return navigate('/issues')
+    }
+    setIssue(foundIssue)
+  }
+
+  useEffect(() => {
+    issueToEdit()
+  }, [id])
 
   const [errors, setErrors] = useState({
     title: '',
@@ -83,11 +98,11 @@ const AddIssue = ({ addIssue }) => {
 
     if (isValid) {
       //form submission
-      addIssue({
+      updateIssue({
         id: uuid(),
         ...issue,
       })
-      toast.success('Issue is added successfully')
+      toast.success('Issue is Updated successfully')
       navigate('/issues')
       //reset the form
       // setIssue(defaultIssue)
@@ -114,7 +129,7 @@ const AddIssue = ({ addIssue }) => {
 
   return (
     <>
-      <h1 className='mb-4 mt-4'>Add Issue</h1>
+      <h1 className='mb-4 mt-4'>Edit Issue</h1>
       <Form onSubmit={handleSubmit}>
         <Form.Group as={Row} className='mb-3'>
           <Col sm={3}>
@@ -318,12 +333,21 @@ const AddIssue = ({ addIssue }) => {
             <Col xs={1}>{completedPercentage}</Col>
           </Row>
         </Form.Group>
-        <Button variant='primary' size='md' type='submit'>
-          Submit Issue
-        </Button>
+        <div className='mt-4'>
+          <Button variant='primary' size='md' className='me-3' type='submit'>
+            Update Issue
+          </Button>
+          <Button
+            variant='secondary'
+            size='md'
+            onClick={() => navigate('/issues')}
+          >
+            Back
+          </Button>
+        </div>
       </Form>
     </>
   )
 }
 
-export default AddIssue
+export default EditIssue

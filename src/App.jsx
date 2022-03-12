@@ -1,10 +1,17 @@
 import { useState } from 'react'
 import { Container, Row, Col } from 'react-bootstrap'
+import { ToastContainer } from 'react-toastify'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
 import AddIssue from './AddIssue'
-import IssueBar from './IssueBar'
+import EditIssue from './EditIssue'
 import Issues from './Issues'
+import Home from './Home'
+import NotFound from './NotFound'
 import Navigation from './Navigation'
+
 import './index.css'
+import 'react-toastify/dist/ReactToastify.css'
 
 const App = () => {
   const [issues, setIssues] = useState([
@@ -42,22 +49,96 @@ const App = () => {
       setCompletedCount((prevCount) => prevCount + 1)
     }
   }
+  const deleteIssue = (id) => {
+    const issuesAfterDelete = issues.filter((issue) => issue.id !== id)
+    setIssues(issuesAfterDelete)
+  }
+
+  const updateIssue = (issueToUpdate) => {
+    const issuesAfterUpdate = issues.map((issue) => {
+      if (issue.id === issueToUpdate.id) {
+        console.log(issueToUpdate)
+        return {
+          ...issueToUpdate,
+          id: issue.id,
+          status:
+            parseInt(issueToUpdate.completedPercentage) < 100
+              ? 'inProgress'
+              : issueToUpdate.status,
+        }
+      } else {
+        return issue
+      }
+    })
+
+    console.log(issuesAfterUpdate)
+
+    setIssues(issuesAfterUpdate)
+  }
+
+  const completeIssue = (id) => {
+    console.log(id)
+    //map
+    //filter
+    const issuesAfterCompletion = issues.map((issue) => {
+      if (issue.id === id) {
+        return {
+          ...issue,
+          status: 'completed',
+          completedPercentage: 100,
+        }
+      } else {
+        return issue
+      }
+    })
+
+    setIssues(issuesAfterCompletion)
+  }
+
   return (
-    <Row>
-      <Navigation />
-      <Col sm={{ span: 10, offset: 1 }}>
-        <Container>
-          <AddIssue addIssue={addIssue} />
-          <IssueBar
-            totalCount={totalCount}
-            newCount={newCount}
-            progressCount={progressCount}
-            completedCount={completedCount}
-          />
-          <Issues issues={issues} />
-        </Container>
-      </Col>
-    </Row>
+    <>
+      <ToastContainer
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+      />
+      <Row>
+        <BrowserRouter>
+          <Navigation />
+          <Col sm={{ span: 10, offset: 1 }}>
+            <Container>
+              <Routes>
+                <Route path='/' index element={<Home />} />
+                <Route path='/add' element={<AddIssue addIssue={addIssue} />} />
+                <Route
+                  path='/edit/:id'
+                  element={
+                    <EditIssue issues={issues} updateIssue={updateIssue} />
+                  }
+                />
+                <Route
+                  path='/issues'
+                  element={
+                    <Issues
+                      issues={issues}
+                      newCount={newCount}
+                      totalCount={totalCount}
+                      completedCount={completedCount}
+                      progressCount={progressCount}
+                      completeIssue={completeIssue}
+                      deleteIssue={deleteIssue}
+                    />
+                  }
+                />
+                <Route path='*' element={<NotFound />} />
+              </Routes>
+            </Container>
+          </Col>
+        </BrowserRouter>
+      </Row>
+    </>
   )
 }
 
