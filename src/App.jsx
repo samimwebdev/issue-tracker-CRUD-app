@@ -12,6 +12,7 @@ import Navigation from './Navigation'
 
 import './index.css'
 import 'react-toastify/dist/ReactToastify.css'
+import IssueForm from './IssueForm'
 
 const App = () => {
   const [issues, setIssues] = useState([
@@ -55,16 +56,16 @@ const App = () => {
   }
 
   const updateIssue = (issueToUpdate) => {
+    // parseInt(issueToUpdate.completedPercentage) < 100
+    //           ? 'inProgress'
+    //           : issueToUpdate.status,
     const issuesAfterUpdate = issues.map((issue) => {
       if (issue.id === issueToUpdate.id) {
         console.log(issueToUpdate)
         return {
           ...issueToUpdate,
           id: issue.id,
-          status:
-            parseInt(issueToUpdate.completedPercentage) < 100
-              ? 'inProgress'
-              : issueToUpdate.status,
+          status: issueToUpdate.status,
         }
       } else {
         return issue
@@ -141,5 +142,7 @@ const App = () => {
     </>
   )
 }
+
+///* <EditIssue issues={issues} updateIssue={updateIssue} /> */
 
 export default App
