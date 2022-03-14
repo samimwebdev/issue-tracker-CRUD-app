@@ -1,6 +1,9 @@
 import { Col, Row } from 'react-bootstrap'
+import { useIssueContext } from './context/IssueContext'
 
-const IssueBar = ({ newCount, totalCount, progressCount, completedCount }) => {
+const IssueBar = () => {
+  const { newCount, totalCount, progressCount, completedCount } =
+    useIssueContext()
   return (
     <Row className='mt-4'>
       <Col>

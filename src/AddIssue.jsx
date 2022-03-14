@@ -1,6 +1,10 @@
+import { useContext } from 'react'
+import { useIssueContext } from './context/IssueContext'
 import IssueForm from './IssueForm'
 
-const AddIssue = ({ addIssue }) => {
+const AddIssue = () => {
+  console.log(useIssueContext())
+  const { addIssue } = useIssueContext()
   const handleAddIssue = (issue) => {
     addIssue(issue)
     //addIssue

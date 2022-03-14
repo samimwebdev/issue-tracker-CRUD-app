@@ -3,8 +3,10 @@ import { Badge, ProgressBar, Modal, Button } from 'react-bootstrap'
 import { FaEdit, FaTrashAlt, FaCheckSquare } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import { useIssueContext } from './context/IssueContext'
 
-const Issue = ({ issue, completeIssue, deleteIssue }) => {
+const Issue = ({ issue }) => {
+  const { deleteIssue, completeIssue } = useIssueContext()
   const {
     id,
     title,
@@ -19,8 +21,6 @@ const Issue = ({ issue, completeIssue, deleteIssue }) => {
 
   const [show, setShow] = useState(false)
   const handleClose = (evt) => {
-    //is user clicked on delete button
-    console.log()
     if (evt.target.dataset.action === 'delete') {
       //if delete button is clicked
       //you can delete issue

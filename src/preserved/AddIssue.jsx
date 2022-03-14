@@ -3,9 +3,9 @@ import { Col, Form, Row, Button } from 'react-bootstrap'
 import { v4 as uuid } from 'uuid'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import TextInput from './formInputs/TextInput'
-import DateInput from './formInputs/DateInput'
-import RadioInput from './formInputs/RadioInput'
+import TextInput from '../formInputs/TextInput'
+import DateInput from '../formInputs/DateInput'
+import RadioInput from '../formInputs/RadioInput'
 
 const defaultIssue = {
   title: '',

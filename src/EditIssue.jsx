@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useIssueContext } from './context/IssueContext'
 import IssueForm from './IssueForm'
-const EditIssue = ({ updateIssue, issues }) => {
+const EditIssue = () => {
+  const { updateIssue, issues } = useIssueContext()
   const [issue, setIssue] = useState(null)
   const navigate = useNavigate()
   const { id } = useParams()
@@ -19,6 +21,7 @@ const EditIssue = ({ updateIssue, issues }) => {
     issueToEdit()
   }, [id])
   const handleUpdateIssue = (issue) => {
+    console.log(issue)
     updateIssue(issue)
   }
 
