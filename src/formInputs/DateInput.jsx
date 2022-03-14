@@ -1,16 +1,32 @@
 import { Col, Form, Row } from 'react-bootstrap'
 
-const DateInput = ({ name, onChange, error, value, placeholder }) => {
+import DatePicker from 'react-datepicker'
+const DateInput = ({
+  name,
+  onChange,
+  error,
+  value,
+  startDate,
+  endDate,
+  minDate,
+  placeholder,
+  ...rest
+}) => {
+  console.log(rest)
   return (
     <>
-      <Form.Control
+      <DatePicker
         type='date'
         name={name}
         id={name}
-        value={value}
+        selected={value}
+        startDate={startDate}
+        endDate={endDate}
+        minDate={minDate}
         onChange={onChange}
         placeholder={placeholder}
         isInvalid={error}
+        {...rest}
       />
       <Form.Control.Feedback type='invalid' className='d-block'>
         {error}

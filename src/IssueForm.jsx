@@ -2,29 +2,20 @@ import { useEffect, useState } from 'react'
 import { Col, Form, Row, Button } from 'react-bootstrap'
 import { v4 as uuid } from 'uuid'
 import { useNavigate } from 'react-router-dom'
+
 import { toast } from 'react-toastify'
 import TextInput from './formInputs/TextInput'
 import DateInput from './formInputs/DateInput'
 import RadioInput from './formInputs/RadioInput'
-
-const defaultIssue = {
-  title: '',
-  subTitle: '',
-  assignedTo: '',
-  startDate: '',
-  endDate: '',
-  priority: 'low',
-  status: 'new',
-  completedPercentage: 1,
-}
+import 'react-datepicker/dist/react-datepicker.css'
 
 const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
   const [issue, setIssue] = useState({
     title: '',
     subTitle: '',
     assignedTo: '',
-    startDate: '',
-    endDate: '',
+    startDate: new Date(),
+    endDate: null,
     priority: 'low',
     status: 'new',
     completedPercentage: 1,
@@ -127,13 +118,15 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
       return navigate('/issues')
     }
     if (isValid) {
+      console.log(typeof issue.startDate)
+      console.log(typeof issue.endDate)
       //form submission
       addIssue({
         id: uuid(),
         ...issue,
       })
       toast.success('Issue is added successfully')
-      navigate('/issues')
+      // navigate('/issues')
       //reset the form
       // setIssue(defaultIssue)
     }
@@ -198,10 +191,14 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
           <Col sm={3}>
             <DateInput
               name='startDate'
-              onChange={handleChange}
-              value={startDate}
+              onChange={(date) => setIssue({ ...issue, startDate: date })}
               placeholder='Enter Start Date'
+              value={startDate}
               error={errorStartDate}
+              startDate={startDate}
+              endDate={endDate}
+              minDate={new Date()}
+              selectsStart
             />
           </Col>
           <Col sm={2}>
@@ -212,10 +209,14 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
           <Col sm={4}>
             <DateInput
               name='endDate'
-              onChange={handleChange}
+              onChange={(date) => setIssue({ ...issue, endDate: date })}
+              startDate={startDate}
               value={endDate}
+              endDate={endDate}
+              minDate={startDate}
               placeholder='Enter End Date'
               error={errorEndDate}
+              selectsEnd
             />
           </Col>
         </Form.Group>
