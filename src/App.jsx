@@ -34,7 +34,6 @@ const App = () => {
   const [completedCount, setCompletedCount] = useState(0)
 
   const addIssue = (issue) => {
-    console.log(issue)
     setIssues((prevIssues) => [...prevIssues, issue])
 
     setTotalCount((prevCount) => prevCount + 1)
