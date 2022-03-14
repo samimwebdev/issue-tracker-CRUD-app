@@ -3,6 +3,15 @@ import { useState, useEffect } from 'react'
 import { v4 as uuid } from 'uuid'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+
+import DatePicker from 'react-datepicker'
+import { addDays } from 'date-fns'
+
+import 'react-datepicker/dist/react-datepicker.css'
+import TextInput from './formInputs/TextInput'
+import DateInput from './formInputs/DateInput'
+import CommonCheckInput from './formInputs/CommonCheckInput'
+
 const defaultIssue = {
   title: '',
   subTitle: '',
@@ -19,8 +28,8 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
     title: '',
     subTitle: '',
     assignedTo: '',
-    startDate: '',
-    endDate: '',
+    startDate: new Date(),
+    endDate: addDays(new Date(), 1),
     priority: 'low',
     status: 'new',
     completedPercentage: 1,
@@ -76,7 +85,6 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
   }
 
   const handleSubmit = (evt) => {
-    console.log('calling...')
     evt.preventDefault()
     const { title, subTitle, assignedTo, startDate, endDate } = issue
     //checking error
@@ -115,7 +123,6 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
     }
     // return true if every element is true, otherwise False
     const isValid = Object.values(issue).every((elm) => elm)
-    console.log(isValid)
 
     if (issue.id && isValid) {
       updateIssue({
@@ -157,72 +164,81 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
     endDate: errorEndDate,
   } = errors
 
+  const statusValues = [
+    {
+      name: 'status',
+      label: 'New',
+      value: 'new',
+      valueToCheck: status,
+    },
+    {
+      name: 'status',
+      label: 'In Progress',
+      value: 'inProgress',
+      valueToCheck: status,
+    },
+    {
+      name: 'status',
+      label: 'Completed',
+      value: 'completed',
+      valueToCheck: status,
+    },
+  ]
+
+  const priorityValues = [
+    {
+      name: 'priority',
+      label: 'High',
+      value: 'high',
+      valueToCheck: priority,
+    },
+    {
+      name: 'priority',
+      label: 'Medium',
+      value: 'medium',
+      valueToCheck: priority,
+    },
+    {
+      name: 'priority',
+      label: 'Low',
+      value: 'low',
+      valueToCheck: priority,
+    },
+  ]
+
   return (
     <>
       <h1 className='mb-4 mt-4'> {issueToEdit ? 'Edit Issue' : 'Add Issue'}</h1>
       <Form onSubmit={handleSubmit}>
-        <Form.Group as={Row} className='mb-3'>
-          <Col sm={3}>
-            <Form.Label htmlFor='title' column>
-              Title
-            </Form.Label>
-          </Col>
-          <Col sm={9}>
-            <Form.Control
-              type='text'
-              name='title'
-              id='title'
-              onChange={handleChange}
-              value={title}
-              placeholder='Enter your Task Name'
-              isInvalid={errorTitle}
-            />
-            <Form.Control.Feedback type='invalid' className='d-block'>
-              {errorTitle}
-            </Form.Control.Feedback>
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className='mb-3'>
-          <Col sm={3}>
-            <Form.Label htmlFor='title' column>
-              Sub Title
-            </Form.Label>
-          </Col>
-          <Col sm={9}>
-            <Form.Control
-              as='textarea'
-              name='subTitle'
-              id='subTitle'
-              onChange={handleChange}
-              value={subTitle}
-              placeholder='Enter your Task Details'
-              isInvalid={errorSubTitle}
-            />
-            <Form.Control.Feedback type='invalid' className='d-block'>
-              {errorSubTitle}
-            </Form.Control.Feedback>
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className='mb-3'>
-          <Col xs={3}>
-            <Form.Label htmlFor='title' column>
-              Assigned To{' '}
-            </Form.Label>
-          </Col>
-          <Col xs={9}>
-            <Form.Control
-              type='text'
-              onChange={handleChange}
-              name='assignedTo'
-              value={assignedTo}
-              isInvalid={errorAssignedTo}
-              placeholder='Enter name whom you have assigned to'
-            />
-            <Form.Control.Feedback type='invalid' className='d-block'>
-              {errorAssignedTo}
-            </Form.Control.Feedback>
-          </Col>
-        </Form.Group>
+        <TextInput
+          label='Title'
+          type='text'
+          name='title'
+          onChange={handleChange}
+          value={title}
+          placeholder='Enter your Task Name'
+          error={errorTitle}
+        />
+        <TextInput
+          label='Sub Title'
+          type='text'
+          name='subTitle'
+          onChange={handleChange}
+          value={subTitle}
+          placeholder='Enter your Task Details'
+          error={errorSubTitle}
+          as='textarea'
+        />
+
+        <TextInput
+          label='Assigned To'
+          type='text'
+          name='assignedTo'
+          onChange={handleChange}
+          value={assignedTo}
+          placeholder='Enter name whom you have assigned to'
+          error={errorAssignedTo}
+        />
         <Form.Group as={Row} className='mb-3'>
           <Col sm={3}>
             <Form.Label htmlFor='startDate' column>
@@ -230,17 +246,22 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
             </Form.Label>
           </Col>
           <Col sm={3}>
-            <Form.Control
-              type='date'
-              onChange={handleChange}
+            <DateInput
+              selected={startDate}
+              onChange={(date) =>
+                setIssue({
+                  ...issue,
+                  startDate: date,
+                })
+              }
               name='startDate'
+              startDate={startDate}
+              endDate={endDate}
+              minDate={new Date()}
               value={startDate}
-              placeholder='Enter Start Date'
-              isInvalid={errorStartDate}
+              error={errorStartDate}
+              selectsStart
             />
-            <Form.Control.Feedback type='invalid' className='d-block'>
-              {errorStartDate}
-            </Form.Control.Feedback>
           </Col>
 
           <Col sm={6}>
@@ -251,116 +272,52 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
                 </Form.Label>
               </Col>
               <Col sm={9}>
-                <Form.Control
-                  type='date'
-                  onChange={handleChange}
+                <DateInput
+                  selected={endDate}
+                  onChange={(date) =>
+                    setIssue({
+                      ...issue,
+                      endDate: date,
+                    })
+                  }
                   name='endDate'
+                  startDate={startDate}
+                  endDate={endDate}
+                  minDate={startDate}
                   value={endDate}
-                  placeholder='Enter End Date'
-                  isInvalid={errorEndDate}
+                  error={errorEndDate}
+                  selectsEnd
                 />
-                <Form.Control.Feedback type='invalid' className='d-block'>
-                  {errorStartDate}
-                </Form.Control.Feedback>
               </Col>
             </Row>
           </Col>
         </Form.Group>
-        <Form.Group className='mb-3'>
-          <Row>
-            <Col sm={3}>
-              <Form.Label htmlFor='priority' column>
-                priority{' '}
-              </Form.Label>
-            </Col>
+        <CommonCheckInput
+          label='priority'
+          onChange={handleChange}
+          valueToIterate={priorityValues}
+        />
+        <CommonCheckInput
+          label='status'
+          onChange={handleChange}
+          valueToIterate={statusValues}
+        />
 
-            <Col sm='auto'>
-              <Form.Check
-                type='radio'
-                onChange={handleChange}
-                name='priority'
-                value='high'
-                label='High'
-                checked={priority === 'high'}
-              />
-            </Col>
-            <Col xs='auto'>
-              <Form.Check
-                type='radio'
-                onChange={handleChange}
-                name='priority'
-                label='Medium'
-                value='medium'
-                checked={priority === 'medium'}
-              />
-            </Col>
-            <Col xs='auto'>
-              <Form.Check
-                type='radio'
-                onChange={handleChange}
-                name='priority'
-                label='Low'
-                value='low'
-                checked={priority === 'low'}
-              />
-            </Col>
-          </Row>
-        </Form.Group>
-        <Form.Group className='mb-3'>
-          <Row>
-            <Col xs={3}>
-              <Form.Label htmlFor='status' column>
-                Status{' '}
-              </Form.Label>
-            </Col>
-
-            <Col xs='auto'>
-              <Form.Check
-                type='radio'
-                onChange={handleChange}
-                name='status'
-                label='New'
-                value='new'
-                checked={status === 'new'}
-              />
-            </Col>
-            <Col xs='auto'>
-              <Form.Check
-                type='radio'
-                onChange={handleChange}
-                name='status'
-                label='In Progress'
-                value='inProgress'
-                checked={status === 'inProgress'}
-              />
-            </Col>
-            <Col xs='auto'>
-              <Form.Check
-                type='radio'
-                onChange={handleChange}
-                name='status'
-                label='Completed'
-                value='completed'
-                checked={status === 'completed'}
-              />
-            </Col>
-          </Row>
-        </Form.Group>
         <Form.Group>
           <Row>
-            <Col xs={3}>
+            <Col sm={3}>
               <Form.Label htmlFor='completedPercentage' column>
                 Completed In percentage{' '}
               </Form.Label>
             </Col>
-            <Col xs={4}>
+            <Col sm={4}>
               <Form.Range
                 value={completedPercentage}
                 name='completedPercentage'
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={1}>{completedPercentage}</Col>
+            <Col sm={1}>{completedPercentage}</Col>
           </Row>
         </Form.Group>
         <div className='mt-4'>

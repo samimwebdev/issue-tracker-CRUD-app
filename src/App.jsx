@@ -20,8 +20,8 @@ const App = () => {
       title: 'sample Title',
       subTitle: 'Task Details',
       assignedTo: 'samim',
-      startDate: '',
-      endDate: '',
+      startDate: new Date(),
+      endDate: new Date(),
       priority: 'medium',
       status: 'new',
       completedPercentage: 90,
@@ -56,7 +56,6 @@ const App = () => {
   const updateIssue = (issueToUpdate) => {
     const issuesAfterUpdate = issues.map((issue) => {
       if (issue.id === issueToUpdate.id) {
-        console.log(issueToUpdate)
         return {
           ...issueToUpdate,
           id: issue.id,
@@ -70,13 +69,10 @@ const App = () => {
       }
     })
 
-    console.log(issuesAfterUpdate)
-
     setIssues(issuesAfterUpdate)
   }
 
   const completeIssue = (id) => {
-    console.log(id)
     //map
     //filter
     const issuesAfterCompletion = issues.map((issue) => {

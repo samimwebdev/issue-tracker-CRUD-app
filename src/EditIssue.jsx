@@ -6,7 +6,6 @@ const EditIssue = ({ issues, updateIssue }) => {
   const [issue, setIssue] = useState(null)
   const navigate = useNavigate()
   const { id } = useParams()
-  console.log(id)
 
   const issueToEdit = () => {
     const foundIssue = issues.find((issue) => issue.id === id)

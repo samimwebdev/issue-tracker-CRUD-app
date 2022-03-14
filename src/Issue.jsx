@@ -3,6 +3,7 @@ import { Badge, ProgressBar, Modal, Button } from 'react-bootstrap'
 import { FaEdit, FaTrashAlt, FaCheckSquare } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import { format } from 'date-fns'
 
 const Issue = ({ issue, completeIssue, deleteIssue }) => {
   const {
@@ -72,8 +73,8 @@ const Issue = ({ issue, completeIssue, deleteIssue }) => {
             {priority}
           </Badge>
         </td>
-        <td>{completedStatus}</td>
-        <td>{endDate}</td>
+        <td>{status}</td>
+        <td>{format(new Date(endDate), 'dd/MM/yyyy')}</td>
         <td>{assignedTo}</td>
         <td>
           <ProgressBar
