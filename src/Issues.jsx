@@ -1,25 +1,15 @@
+import { useContext } from 'react'
 import { Table } from 'react-bootstrap'
+import { IssueContext } from './context/IssueContext'
 import Issue from './Issue'
 import IssueBar from './IssueBar'
 
-const Issues = ({
-  issues,
-  newCount,
-  totalCount,
-  progressCount,
-  completeIssue,
-  completedCount,
-  deleteIssue,
-}) => {
+const Issues = () => {
+  const { issues } = useContext(IssueContext)
   return (
     <>
       <h1>All Issues...</h1>
-      <IssueBar
-        totalCount={totalCount}
-        newCount={newCount}
-        progressCount={progressCount}
-        completedCount={completedCount}
-      />
+      <IssueBar />
       <Table responsive striped bordered hover>
         <thead>
           <tr>
@@ -35,12 +25,7 @@ const Issues = ({
         </thead>
         <tbody>
           {issues.map((issue) => (
-            <Issue
-              key={issue.id}
-              issue={issue}
-              completeIssue={completeIssue}
-              deleteIssue={deleteIssue}
-            />
+            <Issue key={issue.id} issue={issue} />
           ))}
         </tbody>
       </Table>
