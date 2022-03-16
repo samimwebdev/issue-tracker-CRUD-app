@@ -1,19 +1,10 @@
-import { useState } from 'react'
+import { useState, useReducer, useContext } from 'react'
+import { CounterContext } from './context/CounterContext'
 
 const App = () => {
-  const [count, setCount] = useState(0)
-
-  const incrementCount = () => {
-    setCount((count) => count + 1)
-  }
-
-  const decrementCount = () => {
-    setCount((count) => count - 1)
-  }
-
-  const resetCount = () => {
-    setCount(0)
-  }
+  const context = useContext(CounterContext)
+  const { count, incrementCount, decrementCount, resetCount } = context
+  // const [count, setCount] = useState(0)
 
   return (
     <div className='app'>
