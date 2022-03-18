@@ -73,7 +73,7 @@ const Issue = ({ issue }) => {
             {priority}
           </Badge>
         </td>
-        <td>{status}</td>
+        <td>{completedStatus}</td>
         <td>{format(new Date(endDate), 'dd/MM/yyyy')}</td>
         <td>{assignedTo}</td>
         <td>

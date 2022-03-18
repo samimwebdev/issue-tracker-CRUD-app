@@ -21,8 +21,8 @@ export const issueReducer = (state, action) => {
             id: issue.id,
             status:
               parseInt(payload.completedPercentage) < 100
-                ? 'inProgress'
-                : payload.status,
+                ? payload.status
+                : 'completed',
           }
         } else {
           return issue

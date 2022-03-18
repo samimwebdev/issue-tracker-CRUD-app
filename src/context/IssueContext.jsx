@@ -26,31 +26,34 @@ const initialState = [
 
 export const IssueProvider = ({ children }) => {
   const [issues, dispatch] = useReducer(issueReducer, initialState)
-  const { setTotalCount, setNewCount, setProgressCount, setCompletedCount } =
+  const { counterOnIssueAdd, counterOnIssueUpdate, counterOnIssueDelete } =
     useContext(BarCounterContext)
 
   const addIssue = (issue) => {
     dispatch({ type: ADD_ISSUE, payload: issue })
-
-    setTotalCount((prevCount) => prevCount + 1)
-    if (issue.status === 'new') {
-      setNewCount((prevCount) => prevCount + 1)
-    }
-    if (issue.status === 'inProgress') {
-      setProgressCount((prevCount) => prevCount + 1)
-    }
-
-    if (issue.status === 'completed') {
-      setCompletedCount((prevCount) => prevCount + 1)
-    }
+    //counter update on issue add
+    counterOnIssueAdd(issue)
   }
 
   const deleteIssue = (id) => {
     dispatch({ type: DELETE_ISSUE, payload: id })
+    const issue = issues.find((issue) => issue.id === id)
+    //update counter on deleting issue
+    counterOnIssueDelete(issue)
   }
 
   const updateIssue = (issueToUpdate) => {
+    //before updating the we should capture the existing issue status
+    //so that we can subtract in existing counter
+    const issue = issues.find((issue) => issue.id === issueToUpdate.id)
+
+    const updatedIssueWithExistingStatus = {
+      ...issueToUpdate,
+      existingIssueStatus: issue.status,
+    }
     dispatch({ type: UPDATE_ISSUE, payload: issueToUpdate })
+
+    counterOnIssueUpdate(updatedIssueWithExistingStatus)
   }
 
   const completeIssue = (id) => {
