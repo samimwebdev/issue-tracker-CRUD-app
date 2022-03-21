@@ -12,13 +12,10 @@ import Navigation from './Navigation'
 
 import './index.css'
 import 'react-toastify/dist/ReactToastify.css'
+import Register from './auth/Register'
+import Login from './auth/Login'
 
 const App = () => {
-  const [totalCount, setTotalCount] = useState(0)
-  const [newCount, setNewCount] = useState(0)
-  const [progressCount, setProgressCount] = useState(0)
-  const [completedCount, setCompletedCount] = useState(0)
-
   return (
     <>
       <ToastContainer
@@ -38,6 +35,8 @@ const App = () => {
                 <Route path='/add' element={<AddIssue />} />
                 <Route path='/edit/:id' element={<EditIssue />} />
                 <Route path='/issues' element={<Issues />} />
+                <Route path='/register' element={<Register />} />
+                <Route path='/login' element={<Login />} />
                 <Route path='*' element={<NotFound />} />
               </Routes>
             </Container>
