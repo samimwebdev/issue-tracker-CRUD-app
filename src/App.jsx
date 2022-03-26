@@ -1,7 +1,13 @@
-import { useState } from 'react'
-import { Container, Row, Col } from 'react-bootstrap'
+import { useContext, useState } from 'react'
+import { Container, Row, Col, Spinner } from 'react-bootstrap'
 import { ToastContainer } from 'react-toastify'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from 'react-router-dom'
 
 import AddIssue from './AddIssue'
 import EditIssue from './EditIssue'
@@ -14,6 +20,42 @@ import './index.css'
 import 'react-toastify/dist/ReactToastify.css'
 import Register from './auth/Register'
 import Login from './auth/Login'
+import { AuthContext } from './context/AuthContext'
+
+const PublicRoute = ({ children }) => {
+  const location = useLocation()
+  console.log(location.pathname)
+  const { user, userLoaded } = useContext(AuthContext)
+  if (userLoaded) {
+    if (!user) return children
+    return <Navigate to='/issues'></Navigate>
+  } else {
+    return (
+      <div
+        style={{ display: 'grid', minHeight: '100vh', placeItems: 'center' }}
+      >
+        <Spinner animation='grow' size='lg' />
+      </div>
+    )
+  }
+}
+
+const AuthRequired = ({ children }) => {
+  const location = useLocation()
+  const { user, userLoaded } = useContext(AuthContext)
+  if (userLoaded) {
+    if (user) return children
+    return <Navigate to='/login' state={{ from: location.pathname }}></Navigate>
+  } else {
+    return (
+      <div
+        style={{ display: 'grid', minHeight: '100vh', placeItems: 'center' }}
+      >
+        <Spinner animation='grow' size='lg' />
+      </div>
+    )
+  }
+}
 
 const App = () => {
   return (
@@ -31,13 +73,51 @@ const App = () => {
           <Col sm={{ span: 10, offset: 1 }}>
             <Container>
               <Routes>
+                {/* public route */}
                 <Route path='/' index element={<Home />} />
-                <Route path='/add' element={<AddIssue />} />
-                <Route path='/edit/:id' element={<EditIssue />} />
-                <Route path='/issues' element={<Issues />} />
-                <Route path='/register' element={<Register />} />
-                <Route path='/login' element={<Login />} />
+                <Route
+                  path='/register'
+                  element={
+                    <PublicRoute>
+                      <Register />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path='/login'
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
                 <Route path='*' element={<NotFound />} />
+                {/* private route */}
+
+                <Route
+                  path='/issues'
+                  element={
+                    <AuthRequired>
+                      <Issues />
+                    </AuthRequired>
+                  }
+                />
+                <Route
+                  path='/add'
+                  element={
+                    <AuthRequired>
+                      <AddIssue />
+                    </AuthRequired>
+                  }
+                />
+                <Route
+                  path='/edit/:id'
+                  element={
+                    <AuthRequired>
+                      <EditIssue />
+                    </AuthRequired>
+                  }
+                />
               </Routes>
             </Container>
           </Col>

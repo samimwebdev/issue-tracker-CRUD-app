@@ -11,17 +11,18 @@ import 'react-datepicker/dist/react-datepicker.css'
 import TextInput from './formInputs/TextInput'
 import DateInput from './formInputs/DateInput'
 import CommonCheckInput from './formInputs/CommonCheckInput'
+import { parseISO } from 'date-fns/esm'
 
-const defaultIssue = {
-  title: '',
-  subTitle: '',
-  assignedTo: '',
-  startDate: '',
-  endDate: '',
-  priority: 'low',
-  status: 'new',
-  completedPercentage: 1,
-}
+// const defaultIssue = {
+//   title: '',
+//   subTitle: '',
+//   assignedTo: '',
+//   startDate: '',
+//   endDate: '',
+//   priority: 'low',
+//   status: 'new',
+//   completedPercentage: 1,
+// }
 
 const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
   const [issue, setIssue] = useState({
@@ -54,8 +55,8 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
         title,
         subTitle,
         assignedTo,
-        startDate,
-        endDate,
+        startDate: parseISO(startDate),
+        endDate: parseISO(endDate),
         priority,
         status,
         completedPercentage,
@@ -102,7 +103,7 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
       }))
     }
 
-    if (assignedTo === '') {
+    if (!assignedTo) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         assignedTo: 'Assigned to a person is Required',
@@ -135,7 +136,6 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
     if (isValid) {
       //form submission
       addIssue({
-        id: uuid(),
         ...issue,
       })
 
@@ -208,7 +208,10 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
 
   return (
     <>
-      <h1 className='mb-4 mt-4'> {issueToEdit ? 'Edit Issue' : 'Add Issue'}</h1>
+      <h1 className='mb-4 mt-4 text-center'>
+        {' '}
+        {issueToEdit ? 'Edit Issue' : 'Add Issue'}
+      </h1>
       <Form onSubmit={handleSubmit}>
         <TextInput
           label='Title'

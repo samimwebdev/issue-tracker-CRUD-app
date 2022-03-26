@@ -1,0 +1,22 @@
+Frontend
+    - what we see during browsing a website
+    -Tech (HTML, CSS, JAVASCRIPT)
+    -user interaction (dropdown on hover, animation on scroll)
+
+
+Backend- 
+    - what's happened beyond the view
+    - registering user 
+    - Login user 
+    - giving access based on special access 
+    - saving into database, securing business logic
+    - programming language (JAVA, c#, JAVASCRIPT, python)
+
+
+
+CMS- content management system
+    - providing content (As raw data or visually polished template)
+    - Regular website, laravel, django, express etc 
+
+Raw data - Headless CMS  
+

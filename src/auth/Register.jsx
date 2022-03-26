@@ -1,113 +1,169 @@
 import axios from 'axios'
 import { useContext, useState } from 'react'
 import { Form, Button, Row, Col } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { AuthContext } from '../context/AuthContext'
 import TextInput from '../formInputs/TextInput'
+import useFormValidate from '../hooks/useFormValidate'
+import validateRegister from './validateRegister'
+
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm } from 'react-hook-form'
+
+const initialState = {
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+}
+
+const schema = yup
+  .object({
+    username: yup
+      .string('must be string')
+      .required('username is required')
+      .min(5, 'username must be in 5 character in length'),
+    email: yup
+      .string()
+      .email('Email must be in correct format')
+      .trim('Trimmed down')
+      .lowercase()
+      .required('Email is Required'),
+    password: yup.string().required('password is required'),
+    confirmPassword: yup
+      .string()
+      .required('confirm password is required')
+      .oneOf([yup.ref('password')], 'Ypur password do not match'),
+  })
+  .required()
 
 const Register = () => {
-  const [userInfo, setUserInfo] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+  const navigate = useNavigate()
+  const { saveAuthInfo } = useContext(AuthContext)
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(schema),
   })
 
-  const [errors, setErrors] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  })
+  const onSubmit = async (data) => {
+    const { username, email, password } = data
 
-  const handleChange = (evt) => {
-    setUserInfo({
-      ...userInfo,
-      [evt.target.name]: evt.target.value,
-    })
+    try {
+      const response = await axios.post(
+        'http://localhost:1337/api/auth/local/register',
+        {
+          username,
+          email,
+          password,
+        }
+      )
+      console.log(response.data)
 
-    setErrors({
-      ...errors,
-      [evt.target.name]: '',
-    })
-  }
+      //save user data to context
+      saveAuthInfo(response.data)
 
-  const handleSubmit = async (evt) => {
-    evt.preventDefault()
-    console.log(userInfo)
-    const { username, email, password, confirmPassword } = userInfo
-    //checking error
-    if (username === '') {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        username: 'username is Required',
-      }))
-    }
-    const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z]{2,}$/i
-    if (email === '' || !regex.test(email)) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        email: 'Email is Required and must be valid',
-      }))
-    }
-
-    if (password === '' || password.length < 6) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        password:
-          'password is Required and must be More that 6 character in length',
-      }))
-    }
-    if (confirmPassword === '' || password !== confirmPassword) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        confirmPassword: 'Confirm Password is Required and must match password',
-      }))
-    }
-
-    // return true if every element is true, otherwise False
-    const isValid = Object.values(userInfo).every((elm) => elm)
-    console.log(isValid)
-    if (isValid) {
-      evt.preventDefault()
-      //validation check
-      const authInfo = {
-        username,
-        email,
-        password,
-      }
-      try {
-        const response = await axios.post(
-          'http://localhost:1337/api/auth/local/register',
-          authInfo
-        )
-
-        console.log('Well done!')
-        console.log('User profile', response.data.user)
-        console.log('User token', response.data.jwt)
-        console.log('An error occurred:', error.response)
-      } catch (err) {
-        console.log(err.response)
-      }
-
-      // console.log(username, email, password, confirmPassword)
+      //redirecting to the other pages  or show a toast message
+      navigate('/login')
+      toast.success('registration Successful')
+      //on Reload fetching data from localStorge and set
+    } catch (err) {
+      toast.error(err.response.data.error.message)
+      console.log(err.response)
     }
   }
-
-  const { username, email, password, confirmPassword } = userInfo
 
   return (
     <Row>
       <h1 className='mb-4 mt-4 text-center'>Register</h1>
       <Col sm={{ span: 8, offset: 2 }}>
-        <Form onSubmit={handleSubmit} noValidate>
-          <TextInput
+        <Form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Form.Group as={Row} className='mb-3'>
+            <Col sm={3}>
+              <Form.Label htmlFor='username' column>
+                username
+              </Form.Label>
+            </Col>
+            <Col sm={9}>
+              <Form.Control
+                type='text'
+                id='username'
+                {...register('username')}
+                isInvalid={errors?.username}
+              />
+              <Form.Control.Feedback type='invalid' className='d-block'>
+                {errors.username?.message}
+              </Form.Control.Feedback>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className='mb-3'>
+            <Col sm={3}>
+              <Form.Label htmlFor='email' column>
+                email
+              </Form.Label>
+            </Col>
+            <Col sm={9}>
+              <Form.Control
+                type='text'
+                id='email'
+                {...register('email')}
+                isInvalid={errors.email}
+              />
+              <Form.Control.Feedback type='invalid' className='d-block'>
+                {errors.email?.message}
+              </Form.Control.Feedback>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className='mb-3'>
+            <Col sm={3}>
+              <Form.Label htmlFor='password' column>
+                password
+              </Form.Label>
+            </Col>
+            <Col sm={9}>
+              <Form.Control
+                type='password'
+                id='password'
+                isInvalid={errors?.password}
+                {...register('password')}
+              />
+              <Form.Control.Feedback type='invalid' className='d-block'>
+                {errors.password?.message}
+              </Form.Control.Feedback>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className='mb-3'>
+            <Col sm={3}>
+              <Form.Label htmlFor='confirmPassword' column>
+                confirm Password
+              </Form.Label>
+            </Col>
+            <Col sm={9}>
+              <Form.Control
+                type='password'
+                id='confirmPassword'
+                isInvalid={errors.confirmPassword}
+                {...register('confirmPassword')}
+              />
+              <Form.Control.Feedback type='invalid' className='d-block'>
+                {errors.confirmPassword?.message}
+              </Form.Control.Feedback>
+            </Col>
+          </Form.Group>
+          {/* <TextInput
             label='username'
             type='text'
             name='username'
             onChange={handleChange}
             value={username}
             placeholder='Enter your user name'
-            error={errors.username}
+            error={errors?.username}
           />
           <TextInput
             label='email'
@@ -116,7 +172,7 @@ const Register = () => {
             onChange={handleChange}
             value={email}
             placeholder='Enter your email'
-            error={errors.email}
+            error={errors?.email}
           />
 
           <TextInput
@@ -126,7 +182,7 @@ const Register = () => {
             onChange={handleChange}
             value={password}
             placeholder='Enter your password'
-            error={errors.password}
+            error={errors?.password}
           />
 
           <TextInput
@@ -136,11 +192,17 @@ const Register = () => {
             onChange={handleChange}
             value={confirmPassword}
             placeholder='Enter your confirm password'
-            error={errors.confirmPassword}
-          />
+            error={errors?.confirmPassword}
+          /> */}
 
           <div className='mt-4'>
-            <Button variant='primary' size='md' className='me-3' type='submit'>
+            <Button
+              variant='primary'
+              disabled={isSubmitting}
+              size='md'
+              className='me-3'
+              type='submit'
+            >
               Register
             </Button>
           </div>
