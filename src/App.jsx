@@ -1,7 +1,13 @@
-import { useState } from 'react'
-import { Container, Row, Col } from 'react-bootstrap'
-import { ToastContainer } from 'react-toastify'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useState, useContext } from 'react'
+import { Container, Row, Col, Spinner } from 'react-bootstrap'
+import { ToastContainer, toast } from 'react-toastify'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from 'react-router-dom'
 
 import AddIssue from './AddIssue'
 import EditIssue from './EditIssue'
@@ -9,16 +15,54 @@ import Issues from './Issues'
 import Home from './Home'
 import NotFound from './NotFound'
 import Navigation from './Navigation'
+import { AuthContext } from './context/AuthContext'
 
 import './index.css'
 import 'react-toastify/dist/ReactToastify.css'
+import Register from './auth/Register'
+import Login from './auth/Login'
+
+const AuthRequired = ({ children }) => {
+  const location = useLocation()
+  const { user, userLoaded, setAuthRequired } = useContext(AuthContext)
+
+  if (userLoaded) {
+    if (!user) {
+      console.log(user)
+
+      return <Navigate to='/login' state={{ from: location.pathname }} />
+    } else {
+      return children
+    }
+  } else {
+    return (
+      <div
+        style={{ display: 'grid', minHeight: '100vh', placeItems: 'center' }}
+      >
+        <Spinner animation='grow' size='lg' />
+      </div>
+    )
+  }
+}
+
+const PublicRoute = ({ children }) => {
+  const location = useLocation()
+  const { user, userLoaded } = useContext(AuthContext)
+  if (userLoaded) {
+    if (!user) return children
+    return <Navigate to={location?.state?.from || '/issues'}></Navigate>
+  } else {
+    return (
+      <div
+        style={{ display: 'grid', minHeight: '100vh', placeItems: 'center' }}
+      >
+        <Spinner animation='grow' size='lg' />
+      </div>
+    )
+  }
+}
 
 const App = () => {
-  const [totalCount, setTotalCount] = useState(0)
-  const [newCount, setNewCount] = useState(0)
-  const [progressCount, setProgressCount] = useState(0)
-  const [completedCount, setCompletedCount] = useState(0)
-
   return (
     <>
       <ToastContainer
@@ -26,6 +70,7 @@ const App = () => {
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
+        pauseOnHover={false}
         rtl={false}
       />
       <Row>
@@ -35,9 +80,46 @@ const App = () => {
             <Container>
               <Routes>
                 <Route path='/' index element={<Home />} />
-                <Route path='/add' element={<AddIssue />} />
-                <Route path='/edit/:id' element={<EditIssue />} />
-                <Route path='/issues' element={<Issues />} />
+                <Route
+                  path='/add'
+                  element={
+                    <AuthRequired>
+                      <AddIssue />
+                    </AuthRequired>
+                  }
+                />
+                <Route
+                  path='/edit/:id'
+                  element={
+                    <AuthRequired>
+                      <EditIssue />
+                    </AuthRequired>
+                  }
+                />
+                <Route
+                  path='/issues'
+                  element={
+                    <AuthRequired>
+                      <Issues />
+                    </AuthRequired>
+                  }
+                />
+                <Route
+                  path='/register'
+                  element={
+                    <PublicRoute>
+                      <Register />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path='/login'
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
                 <Route path='*' element={<NotFound />} />
               </Routes>
             </Container>
