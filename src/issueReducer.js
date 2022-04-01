@@ -3,11 +3,14 @@ import {
   DELETE_ISSUE,
   UPDATE_ISSUE,
   COMPLETE_ISSUE,
+  GET_ISSUES,
 } from './actions'
 
 export const issueReducer = (state, action) => {
   const { type, payload } = action
   switch (type) {
+    case GET_ISSUES:
+      return [...state, ...payload]
     case ADD_ISSUE:
       return [...state, payload]
     case DELETE_ISSUE:

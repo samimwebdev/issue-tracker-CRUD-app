@@ -1,6 +1,6 @@
-//username
-//email
-//password
+//update issue
+//pagination
+//Bonus assigned To
 
 import { Form, Button, Row, Col } from 'react-bootstrap'
 import { useForm } from 'react-hook-form'

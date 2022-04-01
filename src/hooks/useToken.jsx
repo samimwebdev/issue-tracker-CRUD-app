@@ -2,17 +2,17 @@ import { useState, useEffect } from 'react'
 
 const useToken = () => {
   const [token, setToken] = useState(null)
-  const [loaded, setLoaded] = useState(false)
+  const [tokenLoaded, setTokenLoaded] = useState(false)
   const loadToken = () => {
     const token = localStorage.getItem('issue-tracker-token')
     setToken(token)
-    setLoaded(true)
+    setTokenLoaded(true)
   }
   useEffect(() => {
     loadToken()
   }, [])
 
-  return { token, loaded }
+  return { token, tokenLoaded }
 }
 
 export default useToken

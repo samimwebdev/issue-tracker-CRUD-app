@@ -1,5 +1,5 @@
 import { Col, Form, Row, Button } from 'react-bootstrap'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { v4 as uuid } from 'uuid'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
@@ -11,17 +11,8 @@ import 'react-datepicker/dist/react-datepicker.css'
 import TextInput from './formInputs/TextInput'
 import DateInput from './formInputs/DateInput'
 import CommonCheckInput from './formInputs/CommonCheckInput'
-
-const defaultIssue = {
-  title: '',
-  subTitle: '',
-  assignedTo: '',
-  startDate: '',
-  endDate: '',
-  priority: 'low',
-  status: 'new',
-  completedPercentage: 1,
-}
+import axiosAPI from './utils/axiosAPI'
+import useToken from './hooks/useToken'
 
 const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
   const [issue, setIssue] = useState({
@@ -135,12 +126,8 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
     if (isValid) {
       //form submission
       addIssue({
-        id: uuid(),
         ...issue,
       })
-
-      toast.success('Issue is added successfully')
-      navigate('/issues')
       //reset the form
       // setIssue(defaultIssue)
     }

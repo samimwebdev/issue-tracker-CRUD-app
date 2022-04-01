@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [userLoaded, setUserLoaded] = useState(false)
 
-  const { token, loaded } = useToken()
+  const { token, tokenLoaded } = useToken()
   async function loadUser() {
     try {
       const res = await axios.get('http://localhost:1337/api/users/me', {
@@ -37,12 +37,10 @@ export const AuthProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    if (loaded && authRequired) {
+    if (tokenLoaded) {
       loadUser()
-    } else {
-      setUserLoaded(true)
     }
-  }, [loaded])
+  }, [tokenLoaded])
   const saveAuthInfo = (info) => {
     //save token into localStorage
     localStorage.setItem('issue-tracker-token', info.jwt)
@@ -58,7 +56,6 @@ export const AuthProvider = ({ children }) => {
     saveAuthInfo,
     userLoaded,
     removeAuthInfo,
-    setAuthRequired,
     user,
   }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
