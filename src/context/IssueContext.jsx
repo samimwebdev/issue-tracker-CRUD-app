@@ -1,7 +1,14 @@
 import axios from 'axios'
-import { createContext, useContext, useReducer, useEffect } from 'react'
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useState,
+} from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import qs from 'qs'
 import {
   ADD_ISSUE,
   DELETE_ISSUE,
@@ -24,30 +31,43 @@ const initialState = []
 export const IssueProvider = ({ children }) => {
   const [issues, dispatch] = useReducer(issueReducer, initialState)
   const { token, tokenLoaded } = useToken()
-  const { user } = useContext(AuthContext)
+  const [pageNumber, setPageNumber] = useState(1)
+  const [pageCount, setPageCount] = useState(null)
+
   const navigate = useNavigate()
   const { counterOnIssueAdd, counterOnIssueUpdate, counterOnIssueDelete } =
     useContext(BarCounterContext)
 
   const loadIssues = async () => {
+    const query = qs.stringify(
+      {
+        pagination: {
+          page: pageNumber,
+          pageSize: import.meta.env.VITE_PAGE_SIZE,
+        },
+      },
+      {
+        encodeValuesOnly: true,
+      }
+    )
+
     try {
-      const data = await axiosAPI({
+      const { data, meta } = await axiosAPI({
         method: 'get',
-        url: '/issues',
+        url: `/issues?${query}`,
         config: {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
       })
-      // const res = await axios.get('http://localhost:1337/api/issues', {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // })
 
-      const issues = formatIssues(data.data)
+      const issues = formatIssues(data)
+      console.log(meta)
+
+      setPageCount(meta.pagination.pageCount)
       dispatch({ type: GET_ISSUES, payload: issues })
+      /// update issue bar based on loaded issue
     } catch (err) {
       console.log(err.response)
     }
@@ -58,12 +78,12 @@ export const IssueProvider = ({ children }) => {
       //load Issues from server
       loadIssues()
     }
-  }, [tokenLoaded, token])
+  }, [tokenLoaded, token, pageNumber])
 
   const addIssue = async (issue) => {
     const formattedIssue = {
       ...issue,
-      assigned_to: 1,
+      assigned_to: issue.assignedTo,
       sub_title: issue.subTitle,
       start_date: issue.startDate,
       end_date: issue.endDate,
@@ -94,7 +114,7 @@ export const IssueProvider = ({ children }) => {
       counterOnIssueAdd(issue)
     } catch (err) {
       console.log(err)
-      console.log(err.response)
+      toast.error(err.response.data?.error?.message)
     }
   }
 
@@ -118,26 +138,81 @@ export const IssueProvider = ({ children }) => {
       counterOnIssueDelete(issue)
     } catch (err) {
       console.log(err)
-      console.log(err.response)
+      toast.error(err.response.data?.error?.message)
     }
   }
 
-  const updateIssue = (issueToUpdate) => {
-    //before updating the we should capture the existing issue status
-    //so that we can subtract in existing counter
-    const issue = issues.find((issue) => issue.id === issueToUpdate.id)
-
-    const updatedIssueWithExistingStatus = {
+  const updateIssue = async (issueToUpdate) => {
+    const formattedIssue = {
       ...issueToUpdate,
-      existingIssueStatus: issue.status,
+      assigned_to: issueToUpdate.assignedTo,
+      sub_title: issueToUpdate.subTitle,
+      start_date: issueToUpdate.startDate,
+      end_date: issueToUpdate.endDate,
+      completed_percentage: issueToUpdate.completedPercentage,
     }
-    dispatch({ type: UPDATE_ISSUE, payload: issueToUpdate })
+    //at first send  data to the server and get back data
+    try {
+      const { data } = await axiosAPI({
+        method: 'put',
+        url: `/issues/${issueToUpdate.id}`,
+        data: {
+          data: formattedIssue,
+        },
+        config: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      })
 
-    counterOnIssueUpdate(updatedIssueWithExistingStatus)
+      const updatedIssue = formatIssue(data)
+      //before updating the we should capture the existing issue status
+      //so that we can subtract in existing counter
+      const issue = issues.find((issue) => issue.id === issueToUpdate.id)
+
+      const updatedIssueWithExistingStatus = {
+        ...updatedIssue,
+        existingIssueStatus: issue.status,
+      }
+      dispatch({ type: UPDATE_ISSUE, payload: updatedIssue })
+      toast.success('Issue is Updated successfully')
+      counterOnIssueUpdate(updatedIssueWithExistingStatus)
+      return navigate('/issues')
+    } catch (err) {
+      console.log(err)
+      toast.error(err.response.data?.error?.message)
+    }
   }
 
-  const completeIssue = (id) => {
-    dispatch({ type: COMPLETE_ISSUE, payload: id })
+  const completeIssue = async (id) => {
+    const updatedData = {
+      status: 'completed',
+      completed_percentage: 100,
+    }
+    //at first send  data to the server and get back data
+    try {
+      const { data } = await axiosAPI({
+        method: 'put',
+        url: `/issues/completed/${id}`,
+        data: {
+          data: updatedData,
+        },
+        config: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      })
+
+      //before updating the we should capture the existing issue status
+      dispatch({ type: COMPLETE_ISSUE, payload: data.id })
+      /// update issue bar based on completed issue
+      toast.success('Issue is completed successfully')
+    } catch (err) {
+      console.log(err)
+      toast.error(err.response.data?.error?.message)
+    }
   }
 
   const value = {
@@ -146,6 +221,9 @@ export const IssueProvider = ({ children }) => {
     deleteIssue,
     updateIssue,
     completeIssue,
+    pageCount,
+    pageNumber,
+    setPageNumber,
   }
 
   return <IssueContext.Provider value={value}>{children}</IssueContext.Provider>

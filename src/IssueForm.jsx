@@ -13,6 +13,7 @@ import DateInput from './formInputs/DateInput'
 import CommonCheckInput from './formInputs/CommonCheckInput'
 import axiosAPI from './utils/axiosAPI'
 import useToken from './hooks/useToken'
+import SelectInput from './formInputs/SelectInput'
 
 const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
   const [issue, setIssue] = useState({
@@ -25,6 +26,29 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
     status: 'new',
     completedPercentage: 1,
   })
+  const [users, setUsers] = useState(null)
+  const { token, tokenLoaded } = useToken()
+
+  const loadUsers = async () => {
+    const data = await axiosAPI({
+      method: 'get',
+      url: '/users',
+      config: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    })
+
+    const users = data.map((user) => ({ id: user.id, username: user.username }))
+    setUsers(users)
+  }
+
+  useEffect(() => {
+    if (tokenLoaded && token) {
+      loadUsers()
+    }
+  }, [tokenLoaded, token])
 
   useEffect(() => {
     if (issueToEdit) {
@@ -53,7 +77,6 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
       })
     }
   }, [issueToEdit])
-  const navigate = useNavigate()
 
   const [errors, setErrors] = useState({
     title: '',
@@ -119,11 +142,9 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
       updateIssue({
         ...issue,
       })
-      toast.success('Issue is Updated successfully')
-      return navigate('/issues')
     }
 
-    if (isValid) {
+    if (isValid && !issue.id) {
       //form submission
       addIssue({
         ...issue,
@@ -216,16 +237,24 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
           error={errorSubTitle}
           as='textarea'
         />
+        <SelectInput
+          label='Assigned To'
+          name='assignedTo'
+          onChange={handleChange}
+          value={assignedTo}
+          error={errorAssignedTo}
+          users={users}
+        />
 
-        <TextInput
+        {/* <TextInput
           label='Assigned To'
           type='text'
           name='assignedTo'
           onChange={handleChange}
           value={assignedTo}
           placeholder='Enter name whom you have assigned to'
-          error={errorAssignedTo}
-        />
+          
+        /> */}
         <Form.Group as={Row} className='mb-3'>
           <Col sm={3}>
             <Form.Label htmlFor='startDate' column>

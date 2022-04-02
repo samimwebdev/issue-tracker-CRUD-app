@@ -10,7 +10,7 @@ export const issueReducer = (state, action) => {
   const { type, payload } = action
   switch (type) {
     case GET_ISSUES:
-      return [...state, ...payload]
+      return [...payload]
     case ADD_ISSUE:
       return [...state, payload]
     case DELETE_ISSUE:

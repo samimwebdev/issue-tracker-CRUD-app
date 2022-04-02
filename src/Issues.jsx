@@ -1,11 +1,24 @@
 import { useContext } from 'react'
-import { Table } from 'react-bootstrap'
+import { Pagination, Table } from 'react-bootstrap'
 import { IssueContext } from './context/IssueContext'
 import Issue from './Issue'
 import IssueBar from './IssueBar'
 
+const generateArr = (num) => {
+  const arr = []
+  for (let i = 1; i <= num; i++) {
+    arr.push(i)
+  }
+  return arr
+}
+
 const Issues = () => {
-  const { issues } = useContext(IssueContext)
+  const { issues, pageCount, pageNumber, setPageNumber } =
+    useContext(IssueContext)
+  const pageCountArr = generateArr(pageCount)
+  const handlePageClick = (evt) => {
+    setPageNumber(+evt.target.dataset.id)
+  }
   return (
     <>
       <h1>All Issues...</h1>
@@ -29,6 +42,20 @@ const Issues = () => {
           ))}
         </tbody>
       </Table>
+      <Pagination style={{ justifyContent: 'center' }}>
+        {pageCountArr.map((count, i) => {
+          return (
+            <Pagination.Item
+              onClick={handlePageClick}
+              active={count === pageNumber}
+              data-id={count}
+              key={i}
+            >
+              {count}
+            </Pagination.Item>
+          )
+        })}
+      </Pagination>
     </>
   )
 }
