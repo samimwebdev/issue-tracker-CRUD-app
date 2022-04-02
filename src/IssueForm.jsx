@@ -31,35 +31,25 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
   const { token, tokenLoaded } = useToken()
 
   const loadUsers = async () => {
-    const res = await axiosAPI({
-      url: `/users`,
+    const data = await axiosAPI({
       method: 'get',
+      url: '/users',
       config: {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       },
     })
-    const users = res.map((user) => ({ id: user.id, username: user.username }))
-    const sortedUser = users.sort((a, b) => {
-      const ignoredCaseA = a.username.toLowerCase()
-      const ignoredCaseB = b.username.toLowerCase()
-      if (ignoredCaseA > ignoredCaseB) {
-        return 1
-      } else if (ignoredCaseA < ignoredCaseB) {
-        return -1
-      } else {
-        return 0
-      }
-    })
-    setUsers(sortedUser)
+
+    const users = data.map((user) => ({ id: user.id, username: user.username }))
+    setUsers(users)
   }
 
   useEffect(() => {
     if (tokenLoaded && token) {
       loadUsers()
     }
-  }, [tokenLoaded])
+  }, [tokenLoaded, token])
 
   useEffect(() => {
     if (issueToEdit) {
@@ -88,7 +78,6 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
       })
     }
   }, [issueToEdit])
-  const navigate = useNavigate()
 
   const [errors, setErrors] = useState({
     title: '',
@@ -156,8 +145,9 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
       })
     }
 
-    if (issue.id && isValid) {
-      return updateIssue({
+    if (isValid && !issue.id) {
+      //form submission
+      addIssue({
         ...issue,
       })
     }
@@ -247,14 +237,25 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
           as='textarea'
         />
         <SelectInput
+          label='Assigned To'
+          name='assignedTo'
+          onChange={handleChange}
+          value={assignedTo}
+          error={errorAssignedTo}
           users={users}
+        />
+
+        {/* <TextInput
+          label='Assigned To'
+          type='text'
+          name='assignedTo'
           onChange={handleChange}
           name='assignedTo'
           label='Assigned To'
           value={assignedTo}
-          error={errorAssignedTo}
-        />
-
+          placeholder='Enter name whom you have assigned to'
+          
+        /> */}
         <Form.Group as={Row} className='mb-3'>
           <Col sm={3}>
             <Form.Label htmlFor='startDate' column>

@@ -27,10 +27,6 @@ const EditIssue = () => {
 
     const issue = formatIssue(data.data)
     console.log(issue)
-    // const foundIssue = issues.find((issue) => issue.id === id)
-    // if (!foundIssue) {
-    //   toast.error('Issue is not found to be updated')
-    //   return navigate('/issues')
     setIssue({
       ...issue,
       startDate: parseISO(issue.startDate),

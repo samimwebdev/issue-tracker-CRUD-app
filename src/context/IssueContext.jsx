@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import axios from 'axios'
+>>>>>>> edit-update-complete
 import {
   createContext,
   useContext,
@@ -7,6 +11,7 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import qs from 'qs'
 import {
   ADD_ISSUE,
   DELETE_ISSUE,
@@ -30,25 +35,55 @@ export const IssueProvider = ({ children }) => {
   const [issues, dispatch] = useReducer(issueReducer, initialState)
   const { token, tokenLoaded } = useToken()
   const [pageNumber, setPageNumber] = useState(1)
+<<<<<<< HEAD
   const [error, setError] = useState(null)
+=======
+  const [pageCount, setPageCount] = useState(null)
+
+>>>>>>> edit-update-complete
   const navigate = useNavigate()
   const { counterOnIssueAdd, counterOnIssueUpdate, counterOnIssueDelete } =
     useContext(BarCounterContext)
 
   const loadIssues = async () => {
+    const query = qs.stringify(
+      {
+        pagination: {
+          page: pageNumber,
+          pageSize: import.meta.env.VITE_PAGE_SIZE,
+        },
+      },
+      {
+        encodeValuesOnly: true,
+      }
+    )
+
     try {
-      const data = await axiosAPI({
+      const { data, meta } = await axiosAPI({
         method: 'get',
+<<<<<<< HEAD
         url: `/issues?pagination[page]=${pageNumber}&pagination[pageSize]=10`,
+=======
+        url: `/issues?${query}`,
+>>>>>>> edit-update-complete
         config: {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
       })
+<<<<<<< HEAD
       console.log(data)
       const issues = formatIssues(data.data)
+=======
+
+      const issues = formatIssues(data)
+      console.log(meta)
+
+      setPageCount(meta.pagination.pageCount)
+>>>>>>> edit-update-complete
       dispatch({ type: GET_ISSUES, payload: issues })
+      /// update issue bar based on loaded issue
     } catch (err) {
       toast.error(err.response.data?.error?.message)
 
@@ -99,7 +134,10 @@ export const IssueProvider = ({ children }) => {
     } catch (err) {
       console.log(err)
       toast.error(err.response.data?.error?.message)
+<<<<<<< HEAD
       console.log(err.response)
+=======
+>>>>>>> edit-update-complete
     }
   }
 
@@ -124,8 +162,11 @@ export const IssueProvider = ({ children }) => {
     } catch (err) {
       console.log(err)
       toast.error(err.response.data?.error?.message)
+<<<<<<< HEAD
 
       console.log(err.response)
+=======
+>>>>>>> edit-update-complete
     }
   }
 
@@ -138,6 +179,7 @@ export const IssueProvider = ({ children }) => {
       end_date: issueToUpdate.endDate,
       completed_percentage: issueToUpdate.completedPercentage,
     }
+<<<<<<< HEAD
 
     try {
       const data = await axiosAPI({
@@ -159,12 +201,34 @@ export const IssueProvider = ({ children }) => {
       //before updating the we should capture the existing issue status
       //so that we can subtract in existing counter
       const issue = issues.find((issue) => issue.id === updatedIssue.id)
+=======
+    //at first send  data to the server and get back data
+    try {
+      const { data } = await axiosAPI({
+        method: 'put',
+        url: `/issues/${issueToUpdate.id}`,
+        data: {
+          data: formattedIssue,
+        },
+        config: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      })
+
+      const updatedIssue = formatIssue(data)
+      //before updating the we should capture the existing issue status
+      //so that we can subtract in existing counter
+      const issue = issues.find((issue) => issue.id === issueToUpdate.id)
+>>>>>>> edit-update-complete
 
       const updatedIssueWithExistingStatus = {
         ...updatedIssue,
         existingIssueStatus: issue.status,
       }
       dispatch({ type: UPDATE_ISSUE, payload: updatedIssue })
+<<<<<<< HEAD
 
       counterOnIssueUpdate(updatedIssueWithExistingStatus)
       // const issues = formatIssues(res.data.data)
@@ -175,11 +239,45 @@ export const IssueProvider = ({ children }) => {
       toast.error(err.response.data?.error?.message)
 
       console.log(err.response)
+=======
+      toast.success('Issue is Updated successfully')
+      counterOnIssueUpdate(updatedIssueWithExistingStatus)
+      return navigate('/issues')
+    } catch (err) {
+      console.log(err)
+      toast.error(err.response.data?.error?.message)
+>>>>>>> edit-update-complete
     }
   }
 
-  const completeIssue = (id) => {
-    dispatch({ type: COMPLETE_ISSUE, payload: id })
+  const completeIssue = async (id) => {
+    const updatedData = {
+      status: 'completed',
+      completed_percentage: 100,
+    }
+    //at first send  data to the server and get back data
+    try {
+      const { data } = await axiosAPI({
+        method: 'put',
+        url: `/issues/completed/${id}`,
+        data: {
+          data: updatedData,
+        },
+        config: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      })
+
+      //before updating the we should capture the existing issue status
+      dispatch({ type: COMPLETE_ISSUE, payload: data.id })
+      /// update issue bar based on completed issue
+      toast.success('Issue is completed successfully')
+    } catch (err) {
+      console.log(err)
+      toast.error(err.response.data?.error?.message)
+    }
   }
 
   const value = {
@@ -188,8 +286,14 @@ export const IssueProvider = ({ children }) => {
     deleteIssue,
     updateIssue,
     completeIssue,
+<<<<<<< HEAD
     setPageNumber,
     pageNumber,
+=======
+    pageCount,
+    pageNumber,
+    setPageNumber,
+>>>>>>> edit-update-complete
   }
 
   return <IssueContext.Provider value={value}>{children}</IssueContext.Provider>

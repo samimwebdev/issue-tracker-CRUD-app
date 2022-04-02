@@ -4,8 +4,25 @@ import { IssueContext } from './context/IssueContext'
 import Issue from './Issue'
 import IssueBar from './IssueBar'
 
+const generateArr = (num) => {
+  const arr = []
+  for (let i = 1; i <= num; i++) {
+    arr.push(i)
+  }
+  return arr
+}
+
 const Issues = () => {
+<<<<<<< HEAD
   const { issues, setPageNumber } = useContext(IssueContext)
+=======
+  const { issues, pageCount, pageNumber, setPageNumber } =
+    useContext(IssueContext)
+  const pageCountArr = generateArr(pageCount)
+  const handlePageClick = (evt) => {
+    setPageNumber(+evt.target.dataset.id)
+  }
+>>>>>>> edit-update-complete
   return (
     <>
       <h1>All Issues...</h1>
@@ -29,6 +46,7 @@ const Issues = () => {
           ))}
         </tbody>
       </Table>
+<<<<<<< HEAD
 
       <Pagination style={{ justifyContent: 'center' }}>
         <Pagination.Item
@@ -41,6 +59,21 @@ const Issues = () => {
         >
           Next
         </Pagination.Item>
+=======
+      <Pagination style={{ justifyContent: 'center' }}>
+        {pageCountArr.map((count, i) => {
+          return (
+            <Pagination.Item
+              onClick={handlePageClick}
+              active={count === pageNumber}
+              data-id={count}
+              key={i}
+            >
+              {count}
+            </Pagination.Item>
+          )
+        })}
+>>>>>>> edit-update-complete
       </Pagination>
     </>
   )
