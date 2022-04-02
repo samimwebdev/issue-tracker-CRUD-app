@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from 'react'
 import { v4 as uuid } from 'uuid'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import qs from 'qs'
 
 import DatePicker from 'react-datepicker'
 import { addDays } from 'date-fns'
@@ -13,6 +14,7 @@ import DateInput from './formInputs/DateInput'
 import CommonCheckInput from './formInputs/CommonCheckInput'
 import axiosAPI from './utils/axiosAPI'
 import useToken from './hooks/useToken'
+import SelectInput from './formInputs/SelectInput'
 
 const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
   const [issue, setIssue] = useState({
@@ -25,6 +27,39 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
     status: 'new',
     completedPercentage: 1,
   })
+  const [users, setUsers] = useState(null)
+  const { token, tokenLoaded } = useToken()
+
+  const loadUsers = async () => {
+    const res = await axiosAPI({
+      url: `/users`,
+      method: 'get',
+      config: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    })
+    const users = res.map((user) => ({ id: user.id, username: user.username }))
+    const sortedUser = users.sort((a, b) => {
+      const ignoredCaseA = a.username.toLowerCase()
+      const ignoredCaseB = b.username.toLowerCase()
+      if (ignoredCaseA > ignoredCaseB) {
+        return 1
+      } else if (ignoredCaseA < ignoredCaseB) {
+        return -1
+      } else {
+        return 0
+      }
+    })
+    setUsers(sortedUser)
+  }
+
+  useEffect(() => {
+    if (tokenLoaded && token) {
+      loadUsers()
+    }
+  }, [tokenLoaded])
 
   useEffect(() => {
     if (issueToEdit) {
@@ -114,22 +149,17 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
     }
     // return true if every element is true, otherwise False
     const isValid = Object.values(issue).every((elm) => elm)
-
-    if (issue.id && isValid) {
-      updateIssue({
+    if (isValid && !issue.id) {
+      //form submission
+      return addIssue({
         ...issue,
       })
-      toast.success('Issue is Updated successfully')
-      return navigate('/issues')
     }
 
-    if (isValid) {
-      //form submission
-      addIssue({
+    if (issue.id && isValid) {
+      return updateIssue({
         ...issue,
       })
-      //reset the form
-      // setIssue(defaultIssue)
     }
   }
 
@@ -216,16 +246,15 @@ const IssueForm = ({ addIssue, updateIssue, issue: issueToEdit }) => {
           error={errorSubTitle}
           as='textarea'
         />
-
-        <TextInput
-          label='Assigned To'
-          type='text'
-          name='assignedTo'
+        <SelectInput
+          users={users}
           onChange={handleChange}
+          name='assignedTo'
+          label='Assigned To'
           value={assignedTo}
-          placeholder='Enter name whom you have assigned to'
           error={errorAssignedTo}
         />
+
         <Form.Group as={Row} className='mb-3'>
           <Col sm={3}>
             <Form.Label htmlFor='startDate' column>

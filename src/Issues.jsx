@@ -1,11 +1,11 @@
 import { useContext } from 'react'
-import { Table } from 'react-bootstrap'
+import { Pagination, Table } from 'react-bootstrap'
 import { IssueContext } from './context/IssueContext'
 import Issue from './Issue'
 import IssueBar from './IssueBar'
 
 const Issues = () => {
-  const { issues } = useContext(IssueContext)
+  const { issues, setPageNumber } = useContext(IssueContext)
   return (
     <>
       <h1>All Issues...</h1>
@@ -29,6 +29,19 @@ const Issues = () => {
           ))}
         </tbody>
       </Table>
+
+      <Pagination style={{ justifyContent: 'center' }}>
+        <Pagination.Item
+          onClick={() => setPageNumber((pageNum) => pageNum - 1)}
+        >
+          Prev
+        </Pagination.Item>
+        <Pagination.Item
+          onClick={() => setPageNumber((pageNum) => pageNum + 1)}
+        >
+          Next
+        </Pagination.Item>
+      </Pagination>
     </>
   )
 }

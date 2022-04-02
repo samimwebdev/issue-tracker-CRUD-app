@@ -17,7 +17,7 @@ const EditIssue = () => {
   const issueToEdit = async () => {
     const data = await axiosAPI({
       method: 'get',
-      url: `/issues/${+id}`,
+      url: `/issues/${+id}?populate=assignedTo`,
       config: {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -35,7 +35,7 @@ const EditIssue = () => {
       ...issue,
       startDate: parseISO(issue.startDate),
       endDate: parseISO(issue.endDate),
-      assignedTo: '...',
+      assignedTo: issue.assignedTo.data.id,
     })
   }
 

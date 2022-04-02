@@ -18,10 +18,6 @@ const initialState = {
 
 export const BarCounterContextProvider = ({ children }) => {
   const [counter, dispatch] = useReducer(barCounterReducer, initialState)
-  // const [totalCount, setTotalCount] = useState(0)
-  // const [newCount, setNewCount] = useState(0)
-  // const [progressCount, setProgressCount] = useState(0)
-  // const [completedCount, setCompletedCount] = useState(0)
 
   const counterOnIssueAdd = (issue) => {
     dispatch({ type: ADD_ISSUE_COUNTER, payload: issue })
