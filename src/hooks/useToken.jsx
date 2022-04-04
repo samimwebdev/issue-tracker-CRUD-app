@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const useToken = () => {
+const useToken = (navigateRoute) => {
   const [token, setToken] = useState(null)
   const [tokenLoaded, setTokenLoaded] = useState(false)
   const loadToken = () => {
@@ -10,7 +10,7 @@ const useToken = () => {
   }
   useEffect(() => {
     loadToken()
-  }, [])
+  }, [navigateRoute])
 
   return { token, tokenLoaded }
 }

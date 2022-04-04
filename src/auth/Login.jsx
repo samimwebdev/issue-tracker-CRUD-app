@@ -10,7 +10,9 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { useContext } from 'react'
 import { AuthContext } from '../context/AuthContext'
+import { IssueContext } from '../context/IssueContext'
 import { toast } from 'react-toastify'
+import { axiosInstance } from '../utils/axiosAPI'
 
 const schema = yup.object({
   email: yup
@@ -26,6 +28,7 @@ const Login = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { saveAuthInfo } = useContext(AuthContext)
+  const { setNavigateRoute } = useContext(IssueContext)
   const {
     register,
     handleSubmit,
@@ -39,12 +42,13 @@ const Login = () => {
 
     try {
       // api request to the server
-      const res = await axios.post('http://localhost:1337/api/auth/local', {
+      const res = await axiosInstance.post(`auth/local`, {
         identifier: email,
         password,
       })
       // on successful response navigate to issues route
       saveAuthInfo(res.data)
+      setNavigateRoute(true)
       toast.success('Login successful')
       navigate(location?.state?.from || '/issues')
     } catch (err) {
