@@ -26,7 +26,6 @@ const EditIssue = () => {
     })
 
     const issue = formatIssue(data.data)
-    console.log(issue)
     setIssue({
       ...issue,
       startDate: parseISO(issue.startDate),

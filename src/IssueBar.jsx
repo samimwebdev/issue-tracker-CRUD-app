@@ -1,10 +1,12 @@
 import { Col, Row } from 'react-bootstrap'
 import { useContext } from 'react'
 import { BarCounterContext } from './context/BarCounterContext'
+import { IssueContext } from './context/IssueContext'
 
 const IssueBar = () => {
-  const { newCount, totalCount, progressCount, completedCount } =
-    useContext(BarCounterContext)
+  const { counterBar } = useContext(IssueContext)
+
+  const { totalCount, newCount, progressCount, completedCount } = counterBar
   return (
     <Row className='mt-4'>
       <Col>

@@ -1,6 +1,6 @@
 <<<<<<< HEAD
 =======
-import axios from 'axios'
+
 >>>>>>> edit-update-complete
 import {
   createContext,
@@ -33,17 +33,19 @@ const initialState = []
 
 export const IssueProvider = ({ children }) => {
   const [issues, dispatch] = useReducer(issueReducer, initialState)
-  const { token, tokenLoaded } = useToken()
   const [pageNumber, setPageNumber] = useState(1)
 <<<<<<< HEAD
-  const [error, setError] = useState(null)
 =======
   const [pageCount, setPageCount] = useState(null)
+  const [navigateRoute, setNavigateRoute] = useState(false)
+  const { token, tokenLoaded } = useToken(navigateRoute)
+  const [counterBar, setCounterBar] = useState({})
+  const [counterLoaded, setCounterLoaded] = useState(false)
 
 >>>>>>> edit-update-complete
   const navigate = useNavigate()
-  const { counterOnIssueAdd, counterOnIssueUpdate, counterOnIssueDelete } =
-    useContext(BarCounterContext)
+  // const { counterOnIssueAdd, counterOnIssueUpdate, counterOnIssueDelete } =
+  //   useContext(BarCounterContext)
 
   const loadIssues = async () => {
     const query = qs.stringify(
@@ -52,6 +54,7 @@ export const IssueProvider = ({ children }) => {
           page: pageNumber,
           pageSize: import.meta.env.VITE_PAGE_SIZE,
         },
+        populate: ['assignedTo'],
       },
       {
         encodeValuesOnly: true,
@@ -62,7 +65,6 @@ export const IssueProvider = ({ children }) => {
       const { data, meta } = await axiosAPI({
         method: 'get',
 <<<<<<< HEAD
-        url: `/issues?pagination[page]=${pageNumber}&pagination[pageSize]=10`,
 =======
         url: `/issues?${query}`,
 >>>>>>> edit-update-complete
@@ -73,12 +75,10 @@ export const IssueProvider = ({ children }) => {
         },
       })
 <<<<<<< HEAD
-      console.log(data)
-      const issues = formatIssues(data.data)
+     
 =======
 
       const issues = formatIssues(data)
-      console.log(meta)
 
       setPageCount(meta.pagination.pageCount)
 >>>>>>> edit-update-complete
@@ -86,8 +86,9 @@ export const IssueProvider = ({ children }) => {
       /// update issue bar based on loaded issue
     } catch (err) {
       toast.error(err.response.data?.error?.message)
-
-      console.log(err.response)
+<<<<<<< HEAD
+=======
+>>>>>>> bug-fixing-deployment
     }
   }
 
@@ -97,6 +98,30 @@ export const IssueProvider = ({ children }) => {
       loadIssues()
     }
   }, [tokenLoaded, token, pageNumber])
+
+  async function loadCounter() {
+    try {
+      const data = await axiosAPI({
+        method: 'get',
+        url: `/issues/count`,
+        config: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      })
+
+      setCounterBar(data)
+    } catch (err) {
+      toast.error(err.response.data?.error?.message)
+    }
+  }
+
+  useEffect(() => {
+    if (tokenLoaded && token) {
+      loadCounter()
+    }
+  }, [tokenLoaded, token, counterLoaded])
 
   const addIssue = async (issue) => {
     const formattedIssue = {
@@ -110,9 +135,10 @@ export const IssueProvider = ({ children }) => {
 
     //at first send  data to the server and get back data
     try {
+      setCounterLoaded(false)
       const data = await axiosAPI({
         method: 'post',
-        url: '/issues',
+        url: '/issues?populate=assignedTo',
         data: {
           data: formattedIssue,
         },
@@ -124,24 +150,26 @@ export const IssueProvider = ({ children }) => {
       })
 
       const addedIssue = formatIssue(data.data)
-      // const issues = formatIssues(res.data.data)
 
       dispatch({ type: ADD_ISSUE, payload: addedIssue })
+
+      setCounterLoaded(true)
       toast.success('Issue is added successfully')
       navigate('/issues')
       //counter update on issue add
-      counterOnIssueAdd(issue)
+      // counterOnIssueAdd(issue)
     } catch (err) {
       console.log(err)
       toast.error(err.response.data?.error?.message)
 <<<<<<< HEAD
-      console.log(err.response)
+      
 =======
 >>>>>>> edit-update-complete
     }
   }
 
   const deleteIssue = async (id) => {
+    setCounterLoaded(false)
     try {
       const data = await axiosAPI({
         method: 'delete',
@@ -152,19 +180,19 @@ export const IssueProvider = ({ children }) => {
           },
         },
       })
-      console.log(data)
 
-      const issue = issues.find((issue) => issue.id === data.data.id)
+      // const issue = issues.find((issue) => issue.id === data.data.id)
       dispatch({ type: DELETE_ISSUE, payload: data.data.id })
       //update counter on deleting issue
+      setCounterLoaded(true)
       toast.success('Issue is deleted successfully')
-      counterOnIssueDelete(issue)
+      // counterOnIssueDelete(issue)
     } catch (err) {
       console.log(err)
       toast.error(err.response.data?.error?.message)
 <<<<<<< HEAD
 
-      console.log(err.response)
+      
 =======
 >>>>>>> edit-update-complete
     }
@@ -179,6 +207,7 @@ export const IssueProvider = ({ children }) => {
       end_date: issueToUpdate.endDate,
       completed_percentage: issueToUpdate.completedPercentage,
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
 
     try {
@@ -202,11 +231,14 @@ export const IssueProvider = ({ children }) => {
       //so that we can subtract in existing counter
       const issue = issues.find((issue) => issue.id === updatedIssue.id)
 =======
+=======
+    setCounterLoaded(false)
+>>>>>>> bug-fixing-deployment
     //at first send  data to the server and get back data
     try {
       const { data } = await axiosAPI({
         method: 'put',
-        url: `/issues/${issueToUpdate.id}`,
+        url: `/issues/${issueToUpdate.id}?populate=assignedTo`,
         data: {
           data: formattedIssue,
         },
@@ -220,14 +252,18 @@ export const IssueProvider = ({ children }) => {
       const updatedIssue = formatIssue(data)
       //before updating the we should capture the existing issue status
       //so that we can subtract in existing counter
-      const issue = issues.find((issue) => issue.id === issueToUpdate.id)
+<<<<<<< HEAD
 >>>>>>> edit-update-complete
+=======
+      // const issue = issues.find((issue) => issue.id === issueToUpdate.id)
+>>>>>>> bug-fixing-deployment
 
-      const updatedIssueWithExistingStatus = {
-        ...updatedIssue,
-        existingIssueStatus: issue.status,
-      }
+      // const updatedIssueWithExistingStatus = {
+      //   ...updatedIssue,
+      //   existingIssueStatus: issue.status,
+      // }
       dispatch({ type: UPDATE_ISSUE, payload: updatedIssue })
+<<<<<<< HEAD
 <<<<<<< HEAD
 
       counterOnIssueUpdate(updatedIssueWithExistingStatus)
@@ -240,11 +276,13 @@ export const IssueProvider = ({ children }) => {
 
       console.log(err.response)
 =======
+=======
+      setCounterLoaded(true)
+>>>>>>> bug-fixing-deployment
       toast.success('Issue is Updated successfully')
-      counterOnIssueUpdate(updatedIssueWithExistingStatus)
+      // counterOnIssueUpdate(updatedIssueWithExistingStatus)
       return navigate('/issues')
     } catch (err) {
-      console.log(err)
       toast.error(err.response.data?.error?.message)
 >>>>>>> edit-update-complete
     }
@@ -255,6 +293,7 @@ export const IssueProvider = ({ children }) => {
       status: 'completed',
       completed_percentage: 100,
     }
+    setCounterLoaded(false)
     //at first send  data to the server and get back data
     try {
       const { data } = await axiosAPI({
@@ -272,6 +311,7 @@ export const IssueProvider = ({ children }) => {
 
       //before updating the we should capture the existing issue status
       dispatch({ type: COMPLETE_ISSUE, payload: data.id })
+      setCounterLoaded(true)
       /// update issue bar based on completed issue
       toast.success('Issue is completed successfully')
     } catch (err) {
@@ -287,13 +327,16 @@ export const IssueProvider = ({ children }) => {
     updateIssue,
     completeIssue,
 <<<<<<< HEAD
-    setPageNumber,
-    pageNumber,
 =======
     pageCount,
     pageNumber,
     setPageNumber,
+<<<<<<< HEAD
 >>>>>>> edit-update-complete
+=======
+    setNavigateRoute,
+    counterBar,
+>>>>>>> bug-fixing-deployment
   }
 
   return <IssueContext.Provider value={value}>{children}</IssueContext.Provider>

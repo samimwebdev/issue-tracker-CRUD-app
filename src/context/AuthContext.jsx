@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from 'react'
 import useToken from '../hooks/useToken'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { axiosInstance } from '../utils/axiosAPI'
 export const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
@@ -11,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const { token, tokenLoaded } = useToken()
   async function loadUser() {
     try {
-      const res = await axios.get('http://localhost:1337/api/users/me', {
+      const res = await axiosInstance.get('users/me', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -24,7 +25,6 @@ export const AuthProvider = ({ children }) => {
       })
     } catch (err) {
       toast.error('please login before taking action')
-      console.log(err.response)
     } finally {
       setUserLoaded(true)
     }
@@ -38,9 +38,13 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (tokenLoaded) {
-      loadUser()
+      if (token) {
+        loadUser()
+      } else {
+        setUserLoaded(true)
+      }
     }
-  }, [tokenLoaded])
+  }, [tokenLoaded, token])
   const saveAuthInfo = (info) => {
     //save token into localStorage
     localStorage.setItem('issue-tracker-token', info.jwt)

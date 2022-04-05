@@ -11,6 +11,7 @@ import axios from 'axios'
 import { useContext } from 'react'
 import { AuthContext } from '../context/AuthContext'
 import { toast } from 'react-toastify'
+import { axiosInstance } from '../utils/axiosAPI'
 
 const schema = yup.object({
   username: yup
@@ -49,16 +50,12 @@ const Register = () => {
 
     try {
       // api request to the server
-      const res = await axios.post(
-        'http://localhost:1337/api/auth/local/register',
-        {
-          username,
-          email,
-          password,
-        }
-      )
+      const res = await axiosInstance.post('auth/local/register', {
+        username,
+        email,
+        password,
+      })
       // on successful response navigate to issues route
-      console.log(res.data)
       saveAuthInfo(res.data)
       toast.success('Registration successful')
       navigate('/issues')

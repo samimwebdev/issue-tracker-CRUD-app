@@ -74,7 +74,7 @@ const Issue = ({ issue }) => {
         </td>
         <td>{completedStatus}</td>
         <td>{format(new Date(endDate), 'dd/MM/yyyy')}</td>
-        <td>{assignedTo}</td>
+        <td>{assignedTo?.data?.attributes?.username}</td>
         <td>
           <ProgressBar
             variant={`${HighPercentageClass}${mediumPercentageClass}${lowPercentageClass}`}
