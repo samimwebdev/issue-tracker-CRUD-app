@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> edit-update-complete
 import {
   createContext,
   useContext,
@@ -34,15 +30,11 @@ const initialState = []
 export const IssueProvider = ({ children }) => {
   const [issues, dispatch] = useReducer(issueReducer, initialState)
   const [pageNumber, setPageNumber] = useState(1)
-<<<<<<< HEAD
-=======
   const [pageCount, setPageCount] = useState(null)
   const [navigateRoute, setNavigateRoute] = useState(false)
   const { token, tokenLoaded } = useToken(navigateRoute)
   const [counterBar, setCounterBar] = useState({})
   const [counterLoaded, setCounterLoaded] = useState(false)
-
->>>>>>> edit-update-complete
   const navigate = useNavigate()
   // const { counterOnIssueAdd, counterOnIssueUpdate, counterOnIssueDelete } =
   //   useContext(BarCounterContext)
@@ -64,31 +56,22 @@ export const IssueProvider = ({ children }) => {
     try {
       const { data, meta } = await axiosAPI({
         method: 'get',
-<<<<<<< HEAD
-=======
+
         url: `/issues?${query}`,
->>>>>>> edit-update-complete
+
         config: {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
       })
-<<<<<<< HEAD
-     
-=======
-
       const issues = formatIssues(data)
 
       setPageCount(meta.pagination.pageCount)
->>>>>>> edit-update-complete
       dispatch({ type: GET_ISSUES, payload: issues })
       /// update issue bar based on loaded issue
     } catch (err) {
       toast.error(err.response.data?.error?.message)
-<<<<<<< HEAD
-=======
->>>>>>> bug-fixing-deployment
     }
   }
 
@@ -159,12 +142,7 @@ export const IssueProvider = ({ children }) => {
       //counter update on issue add
       // counterOnIssueAdd(issue)
     } catch (err) {
-      console.log(err)
       toast.error(err.response.data?.error?.message)
-<<<<<<< HEAD
-      
-=======
->>>>>>> edit-update-complete
     }
   }
 
@@ -188,13 +166,7 @@ export const IssueProvider = ({ children }) => {
       toast.success('Issue is deleted successfully')
       // counterOnIssueDelete(issue)
     } catch (err) {
-      console.log(err)
       toast.error(err.response.data?.error?.message)
-<<<<<<< HEAD
-
-      
-=======
->>>>>>> edit-update-complete
     }
   }
 
@@ -207,33 +179,6 @@ export const IssueProvider = ({ children }) => {
       end_date: issueToUpdate.endDate,
       completed_percentage: issueToUpdate.completedPercentage,
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-    try {
-      const data = await axiosAPI({
-        method: 'put',
-        url: `/issues/${issueToUpdate.id}`,
-        data: {
-          data: formattedIssue,
-        },
-        config: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      })
-
-      const updatedIssue = formatIssue(data.data)
-      console.log(updatedIssue)
-
-      //before updating the we should capture the existing issue status
-      //so that we can subtract in existing counter
-      const issue = issues.find((issue) => issue.id === updatedIssue.id)
-=======
-=======
-    setCounterLoaded(false)
->>>>>>> bug-fixing-deployment
     //at first send  data to the server and get back data
     try {
       const { data } = await axiosAPI({
@@ -252,39 +197,24 @@ export const IssueProvider = ({ children }) => {
       const updatedIssue = formatIssue(data)
       //before updating the we should capture the existing issue status
       //so that we can subtract in existing counter
-<<<<<<< HEAD
->>>>>>> edit-update-complete
-=======
       // const issue = issues.find((issue) => issue.id === issueToUpdate.id)
->>>>>>> bug-fixing-deployment
 
       // const updatedIssueWithExistingStatus = {
       //   ...updatedIssue,
       //   existingIssueStatus: issue.status,
       // }
       dispatch({ type: UPDATE_ISSUE, payload: updatedIssue })
-<<<<<<< HEAD
-<<<<<<< HEAD
 
       counterOnIssueUpdate(updatedIssueWithExistingStatus)
       // const issues = formatIssues(res.data.data)
       toast.success('Issue is updated successfully')
       navigate('/issues')
     } catch (err) {
-      console.log(err)
       toast.error(err.response.data?.error?.message)
-
-      console.log(err.response)
-=======
-=======
       setCounterLoaded(true)
->>>>>>> bug-fixing-deployment
       toast.success('Issue is Updated successfully')
       // counterOnIssueUpdate(updatedIssueWithExistingStatus)
       return navigate('/issues')
-    } catch (err) {
-      toast.error(err.response.data?.error?.message)
->>>>>>> edit-update-complete
     }
   }
 
@@ -326,17 +256,11 @@ export const IssueProvider = ({ children }) => {
     deleteIssue,
     updateIssue,
     completeIssue,
-<<<<<<< HEAD
-=======
     pageCount,
     pageNumber,
     setPageNumber,
-<<<<<<< HEAD
->>>>>>> edit-update-complete
-=======
     setNavigateRoute,
     counterBar,
->>>>>>> bug-fixing-deployment
   }
 
   return <IssueContext.Provider value={value}>{children}</IssueContext.Provider>

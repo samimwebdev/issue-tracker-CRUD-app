@@ -13,16 +13,12 @@ const generateArr = (num) => {
 }
 
 const Issues = () => {
-<<<<<<< HEAD
-  const { issues, setPageNumber } = useContext(IssueContext)
-=======
   const { issues, pageCount, pageNumber, setPageNumber } =
     useContext(IssueContext)
   const pageCountArr = generateArr(pageCount)
   const handlePageClick = (evt) => {
     setPageNumber(+evt.target.dataset.id)
   }
->>>>>>> edit-update-complete
   return (
     <>
       <h1>All Issues...</h1>
@@ -46,20 +42,6 @@ const Issues = () => {
           ))}
         </tbody>
       </Table>
-<<<<<<< HEAD
-
-      <Pagination style={{ justifyContent: 'center' }}>
-        <Pagination.Item
-          onClick={() => setPageNumber((pageNum) => pageNum - 1)}
-        >
-          Prev
-        </Pagination.Item>
-        <Pagination.Item
-          onClick={() => setPageNumber((pageNum) => pageNum + 1)}
-        >
-          Next
-        </Pagination.Item>
-=======
       <Pagination style={{ justifyContent: 'center' }}>
         {pageCountArr.map((count, i) => {
           return (
@@ -73,7 +55,6 @@ const Issues = () => {
             </Pagination.Item>
           )
         })}
->>>>>>> edit-update-complete
       </Pagination>
     </>
   )
